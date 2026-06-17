@@ -140,3 +140,27 @@ function push(out: MimeSymbol[], kind: SymbolKind, name: string, node: TreeSitte
         endLine: node.endPosition.row + 1,
     });
 }
+
+// References query for tree-sitter-perl (SPEC §16). Conservative — precision
+// over recall. Only call edges are honest in Perl: imports are bareword module
+// paths (`use List::Util`) with no bound symbol to join (like Go), so they are
+// not emitted, and bare scalar/array reads are not refs.
+//
+//   function_call_expression → call (callee name). Two callee shapes:
+//     bareword `foo(...)` / `Foo::other(...)` — the `function` field is a leaf;
+//     `&foo(...)` — the `function` field wraps a (varname). The bareword pattern
+//     excludes the `&` form (its leaf text carries the sigil) via #not-match?,
+//     and the amp form captures the inner varname so the name stays sigil-free.
+//   method_call_expression → call on the method name (covers `$obj->m(...)`,
+//     `Class->new(...)` — Perl has no syntactic instantiate, so it is a call).
+export const refsQuery = `
+((function_call_expression
+  function: (function) @ref.call)
+ (#not-match? @ref.call "^&"))
+
+(function_call_expression
+  function: (function (varname) @ref.call))
+
+(method_call_expression
+  method: (method) @ref.call)
+`;
