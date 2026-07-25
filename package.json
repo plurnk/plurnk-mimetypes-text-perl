@@ -1,6 +1,6 @@
 {
     "name": "@plurnk/plurnk-mimetypes-text-perl",
-    "version": "1.2.0",
+    "version": "1.3.1",
     "description": "text/x-perl mimetype handler for plurnk-service. Tier 2: tree-sitter-perl grammar built to WASM and shipped pre-built. Covers packages, subroutines (with signatures), and variable declarations.",
     "type": "module",
     "license": "MIT",
@@ -24,7 +24,7 @@
                 ]
             }
         ],
-        "builtAgainst": "1.2.0"
+        "builtAgainst": "1.3.1"
     },
     "exports": {
         ".": {
@@ -56,12 +56,12 @@
         "web-tree-sitter": "^0.26.9"
     },
     "devDependencies": {
-        "@plurnk/plurnk-mimetypes": "1.2.0",
+        "@plurnk/plurnk-mimetypes": "1.3.1",
         "@types/node": "^26.0.0",
         "tree-sitter-cli": "^0.26.9",
         "typescript": "^7.0.2"
     },
     "peerDependencies": {
-        "@plurnk/plurnk-mimetypes": "~1.2.0"
+        "@plurnk/plurnk-mimetypes": "^1.3.1"
     }
 }
