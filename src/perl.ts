@@ -1,4 +1,5 @@
-import type { MimeSymbol, SymbolKind, TreeSitterNode } from "@plurnk/plurnk-mimetypes";
+import { treeSitterSpan } from "@plurnk/plurnk-mimetypes";
+import type { SymbolKind, TreeSitterNode, TreeSitterSymbolProjection } from "@plurnk/plurnk-mimetypes";
 
 // Perl SPEC §3 mapping for tree-sitter-perl.
 //
@@ -6,8 +7,8 @@ import type { MimeSymbol, SymbolKind, TreeSitterNode } from "@plurnk/plurnk-mime
 //   subroutine_declaration_statement    → function (with signature params if present)
 //   expression_statement → assignment with variable_declaration → variable / constant
 //   use_statement of module "constant"  → constant per name=>value pair
-export function extract(root: TreeSitterNode): MimeSymbol[] {
-    const out: MimeSymbol[] = [];
+export function extract(root: TreeSitterNode): TreeSitterSymbolProjection[] {
+    const out: TreeSitterSymbolProjection[] = [];
     for (let i = 0; i < root.namedChildCount; i += 1) {
         const child = root.namedChild(i);
         if (!child) continue;
@@ -16,7 +17,7 @@ export function extract(root: TreeSitterNode): MimeSymbol[] {
     return out;
 }
 
-function dispatch(node: TreeSitterNode, out: MimeSymbol[]): void {
+function dispatch(node: TreeSitterNode, out: TreeSitterSymbolProjection[]): void {
     switch (node.type) {
         case "package_statement": {
             const name = node.childForFieldName("name");
@@ -42,8 +43,7 @@ function dispatch(node: TreeSitterNode, out: MimeSymbol[]): void {
             out.push({
                 name: name.text,
                 kind: "function",
-                line: node.startPosition.row + 1,
-                endLine: node.endPosition.row + 1,
+                span: treeSitterSpan(node),
                 params,
             });
             return;
@@ -132,12 +132,11 @@ function isScreamingSnake(name: string): boolean {
     return hasLetter;
 }
 
-function push(out: MimeSymbol[], kind: SymbolKind, name: string, node: TreeSitterNode): void {
+function push(out: TreeSitterSymbolProjection[], kind: SymbolKind, name: string, node: TreeSitterNode): void {
     out.push({
         name,
         kind,
-        line: node.startPosition.row + 1,
-        endLine: node.endPosition.row + 1,
+        span: treeSitterSpan(node),
     });
 }
 

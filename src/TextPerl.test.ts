@@ -114,3 +114,22 @@ describe("TextPerl — deep-json", () => {
         assert.ok(Array.isArray(tree.children));
     });
 });
+
+describe("TextPerl — parser coordinates", () => {
+    it("materializes Unicode spans across LF, CRLF, and CR boundaries", async () => {
+        const firstLine = "my $a = \"😀e\u0301\";";
+        for (const separator of ["\n", "\r\n", "\r"]) {
+            const symbols = await h().extractRaw(`${firstLine}${separator}sub f { 1 }`);
+            const first = symbols.find((symbol) => symbol.name === "a");
+            const second = symbols.find((symbol) => symbol.name === "f");
+            assert.deepEqual(first && {
+                line: first.line,
+                column: first.column,
+                endLine: first.endLine,
+                endColumn: first.endColumn,
+            }, { line: 1, column: 1, endLine: 1, endColumn: Array.from(firstLine).length });
+            assert.equal(second?.line, 2);
+            assert.equal(second?.column, 1);
+        }
+    });
+});
