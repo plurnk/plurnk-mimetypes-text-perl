@@ -16,3 +16,8 @@ Registers `text/x-perl` with `.pl`, `.pm`, `.t`, `.pod` extensions.
 ## license
 
 MIT.
+
+## Versioning
+
+This package versions independently. Compatibility is declared by its dependency
+ranges; a Plurnk release does not require a release of this package.
